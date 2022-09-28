@@ -838,17 +838,6 @@ PeiCheckAndSwitchStack (
       DEBUG ((DEBUG_INFO, "Heap Offset = 0x%lX Stack Offset = 0x%lX\n", (UINT64)Private->HeapOffset, (UINT64)Private->StackOffset));
 
       //
-      // Calculate new HandOffTable and PrivateData address in permanent memory's stack
-      //
-      if (StackOffsetPositive) {
-        SecCoreData = (CONST EFI_SEC_PEI_HAND_OFF *)((UINTN)(VOID *)SecCoreData + StackOffset);
-        Private     = (PEI_CORE_INSTANCE *)((UINTN)(VOID *)Private + StackOffset);
-      } else {
-        SecCoreData = (CONST EFI_SEC_PEI_HAND_OFF *)((UINTN)(VOID *)SecCoreData - StackOffset);
-        Private     = (PEI_CORE_INSTANCE *)((UINTN)(VOID *)Private - StackOffset);
-      }
-
-      //
       // Temporary Ram Support PPI is provided by platform, it will copy
       // temporary memory to permanent memory and do stack switching.
       // After invoking Temporary Ram Support PPI, the following code's
@@ -860,6 +849,17 @@ PeiCheckAndSwitchStack (
                                 (EFI_PHYSICAL_ADDRESS)(UINTN)(TopOfNewStack - TemporaryStackSize),
                                 TemporaryRamSize
                                 );
+
+      //
+      // Calculate new HandOffTable and PrivateData address in permanent memory's stack
+      //
+      if (StackOffsetPositive) {
+        SecCoreData = (CONST EFI_SEC_PEI_HAND_OFF *)((UINTN)(VOID *)SecCoreData + StackOffset);
+        Private     = (PEI_CORE_INSTANCE *)((UINTN)(VOID *)Private + StackOffset);
+      } else {
+        SecCoreData = (CONST EFI_SEC_PEI_HAND_OFF *)((UINTN)(VOID *)SecCoreData - StackOffset);
+        Private     = (PEI_CORE_INSTANCE *)((UINTN)(VOID *)Private - StackOffset);
+      }
 
       //
       // Migrate memory pages allocated in pre-memory phase.
